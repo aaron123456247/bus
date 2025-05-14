@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>重庆主城区3108路公交运营组织优化分析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#FF7D00',
+                        neutral: {
+                            100: '#F5F7FA',
+                            200: '#E4E7ED',
+                            300: '#C0C4CC',
+                            400: '#909399',
+                            500: '#606266',
+                            600: '#303133',
+                            700: '#1E1E1E',
+                        }
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 12px rgba(0, 0, 0, 0.08)',
+                        'card-hover': '0 8px 24px rgba(0, 0, 0, 0.12)',
+                    }
+                },
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .animate-fade-in {
+                animation: fadeIn 0.6s ease-in-out;
+            }
+            .animate-slide-up {
+                animation: slideUp 0.8s ease-out;
+            }
+            .nav-scrolled {
+                @apply bg-white/95 shadow-md;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="font-inter bg-neutral-100 text-neutral-600">
+    <!-- 导航栏 -->
+    <nav id="main-nav" class="fixed w-full top-0 z-50 transition-all duration-300 py-4 bg-white/80 backdrop-blur-sm">
+        <div class="container mx-auto px-4 md:px-6 flex justify-between items-center">
+            <a href="#" class="text-primary font-bold text-xl md:text-2xl flex items-center">
+                <i class="fa fa-bus mr-2"></i>
+                <span>3108路公交优化分析</span>
+            </a>
+            
+            <!-- 桌面导航 -->
+            <div class="hidden md:flex space-x-8">
+                <a href="#current-situation" class="text-neutral-600 hover:text-primary transition-colors duration-200 font-medium">线路现状</a>
+                <a href="#optimization-plan" class="text-neutral-600 hover:text-primary transition-colors duration-200 font-medium">优化方案</a>
+                <a href="#comparison" class="text-neutral-600 hover:text-primary transition-colors duration-200 font-medium">对比分析</a>
+                <a href="#limitations" class="text-neutral-600 hover:text-primary transition-colors duration-200 font-medium">局限性分析</a>
+            </div>
+            
+            <!-- 移动端菜单按钮 -->
+            <button id="menu-toggle" class="md:hidden text-neutral-600 focus:outline-none">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- 移动端导航菜单 -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white absolute w-full shadow-lg animate-fade-in">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+                <a href="#current-situation" class="text-neutral-600 hover:text-primary transition-colors duration-200 py-2 border-b border-neutral-200">线路现状</a>
+                <a href="#optimization-plan" class="text-neutral-600 hover:text-primary transition-colors duration-200 py-2 border-b border-neutral-200">优化方案</a>
+                <a href="#comparison" class="text-neutral-600 hover:text-primary transition-colors duration-200 py-2 border-b border-neutral-200">对比分析</a>
+                <a href="#limitations" class="text-neutral-600 hover:text-primary transition-colors duration-200 py-2">局限性分析</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="pt-24 pb-16">
+        <!-- 英雄区域 -->
+        <section class="relative bg-gradient-to-br from-primary/90 to-primary text-white py-20 md:py-28 overflow-hidden">
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-0 left-0 w-full h-full bg-[url('https://picsum.photos/id/1071/1920/1080')] bg-cover bg-center"></div>
+            </div>
+            <div class="container mx-auto px-4 md:px-6 relative z-10">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-shadow mb-6 animate-slide-up">
+                        重庆主城区3108路公交运营组织优化分析
+                    </h1>
+                    <p class="text-[clamp(1rem,2vw,1.25rem)] text-white/90 mb-8 max-w-2xl mx-auto animate-slide-up" style="animation-delay: 0.2s">
+                        基于客流特征与运营数据分析，提出科学优化方案，提升公交服务质量与效率
+                    </p>
+                    <a href="#current-situation" class="inline-block bg-white text-primary font-medium py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 animate-slide-up" style="animation-delay: 0.4s">
+                        查看分析报告
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 波浪装饰 -->
+            <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] rotate-180">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" class="w-full h-12 md:h-20">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C0,0,31,30,31,30z" class="fill-neutral-100"></path>
+                </svg>
+            </div>
+        </section>
+
+        <!-- 线路现状分析 -->
+        <section id="current-situation" class="py-16 bg-neutral-100">
+            <div class="container mx-auto px-4 md:px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.75rem,3vw,2.5rem)] font-bold text-neutral-700 mb-4">线路现状分析</h2>
+                    <p class="text-neutral-500 max-w-3xl mx-auto">基于实际跟车调查与数据分析，全面呈现3108路公交当前运营状况</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <!-- 客流特征 -->
+                    <div class="bg-white rounded-xl shadow-card p-6 hover:shadow-card-hover transition-shadow duration-300 animate-fade-in">
+                        <h3 class="text-xl font-bold text-neutral-700 mb-4 flex items-center">
+                            <i class="fa fa-users text-primary mr-2"></i>客流特征
+                        </h3>
+                        <p class="text-neutral-600 mb-6">平峰时段（16:00 - 17:00）各站点客流量分布情况：</p>
+                        
+                        <div class="h-80 mb-6">
+                            <canvas id="passengerFlowChart"></canvas>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <p class="text-neutral-600">
+                                <span class="font-medium">上行方向：</span>起始站轨道兰花路站上车人数为8人，随着线路行进，到二塘路口站时上车人数累计至5人，之后逐渐减少，在终点站二塘路中段站下车人数达到6人。
+                            </p>
+                            <p class="text-neutral-600">
+                                <span class="font-medium">下行方向：</span>起始站二塘路中段站上车人数为4人，随后在兰花路站上车人数增加到8人，之后各站点上下车人数出现波动，终点站轨道兰花路站下车人数为6人。
+                            </p>
+                            <p class="text-neutral-600">
+                                <span class="font-medium">空间分布特征：</span>二塘路口站和轨道兰花路站客流量相对较大，说明这些站点周边的出行需求更为旺盛。
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- 运营问题 -->
+                    <div class="bg-white rounded-xl shadow-card p-6 hover:shadow-card-hover transition-shadow duration-300 animate-fade-in" style="animation-delay: 0.2s">
+                        <h3 class="text-xl font-bold text-neutral-700 mb-4 flex items-center">
+                            <i class="fa fa-exclamation-triangle text-secondary mr-2"></i>运营问题
+                        </h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex">
+                                <div class="bg-primary/10 rounded-full p-3 mr-4 flex-shrink-0">
+                                    <i class="fa fa-road text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-neutral-700 mb-2">站点间距不合理</h4>
+                                    <p class="text-neutral-600">部分站点间距过近，如丹龙南路与兰花路站，间距约为400米，导致车辆频繁停靠，影响运行速度；而部分较长站间距如二塘路口站到二塘路中段站约800米，对于一些出行距离较短的乘客可能不太便利。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex">
+                                <div class="bg-primary/10 rounded-full p-3 mr-4 flex-shrink-0">
+                                    <i class="fa fa-map-marker text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-neutral-700 mb-2">站点位置不合理</h4>
+                                    <p class="text-neutral-600">兰花路站距天台岚雅居乐小学和重庆市第110中学雅居乐校区较远，乘客步行时间长，降低了公交的吸引力。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex">
+                                <div class="bg-primary/10 rounded-full p-3 mr-4 flex-shrink-0">
+                                    <i class="fa fa-clock-o text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-neutral-700 mb-2">平峰时段车辆利用率低</h4>
+                                    <p class="text-neutral-600">平峰时段（如16:00 - 17:00）部分车辆载客量不足，导致资源浪费，运营效率低下。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex">
+                                <div class="bg-primary/10 rounded-full p-3 mr-4 flex-shrink-0">
+                                    <i class="fa fa-subway text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-neutral-700 mb-2">与轨道交通衔接不足</h4>
+                                    <p class="text-neutral-600">公交与地铁10号线的信息共享不足，乘客换乘不便，未能充分发挥公共交通网络的整体效能。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 站点间距分析 -->
+                <div class="bg-white rounded-xl shadow-card p-6 hover:shadow-card-hover transition-shadow duration-300 animate-fade-in" style="animation-delay: 0.4s">
+                    <h3 class="text-xl font-bold text-neutral-700 mb-4 flex items-center">
+                        <i class="fa fa-arrows-h text-primary mr-2"></i>站点间距分析
+                    </h3>
+                    <p class="text-neutral-600 mb-6">各站点之间的距离分布情况：</p>
+                    
+                    <div class="h-72 mb-6">
+                        <canvas id="stationDistanceChart"></canvas>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-neutral-50 p-4 rounded-lg">
+                            <h4 class="font-medium text-neutral-700 mb-2">间距过近站点</h4>
+                            <ul class="space-y-2 text-neutral-600">
+                                <li>• 二塘路下口站 - 丹龙南路站：约350米</li>
+                                <li>• 丹龙南路站 - 美堤雅城站：约500米</li>
+                            </ul>
+                        </div>
+                        <div class="bg-neutral-50 p-4 rounded-lg">
+                            <h4 class="font-medium text-neutral-700 mb-2">间距较远站点</h4>
+                            <ul class="space-y-2 text-neutral-600">
+                                <li>• 美堤雅城站 - 二塘路口站：约700米</li>
+                                <li>• 二塘路口站 - 二塘路中段站：约800米</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 优化方案 -->
+        <section id="optimization-plan" class="py-16 bg-white">
+            <div class="container mx-auto px-4 md:px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.75rem,3vw,2.5rem)] font-bold text-neutral-700 mb-4">优化方案</h2>
+                    <p class="text-neutral-500 max-w-3xl mx-auto">基于现状分析，提出两种优化方案，提升公交运营效率与服务质量</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- 方案一：站点设置优化 -->
+                    <div class="bg-neutral-50 rounded-xl shadow-card p-6 hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-1 animate-fade-in">
+                        <div class="bg-primary text-white rounded-t-xl p-4 mb-6">
+                            <h3 class="text-xl font-bold flex items-center">
+                                <i class="fa fa-map-marker mr-2"></i>方案一：站点设置优化
+                            </h3>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="flex">
+                                <div class="bg-primary/10 rounded-full p-3 mr-4 flex-shrink-0">
+                                    <i class="fa fa-arrows-h text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-neutral-700 mb-2">优化站点间距</h4>
+                                    <p class="text-neutral-600">根据现场观察和客流量统计，发现部分站点间距过近，导致车辆频繁停靠，影响运行速度。建议对这些站点进行合并或调整，适当增大站点间距，减少不必要的停靠，提高运营效率。例如，丹龙南路站和兰花路站间距较近，且周边客流分布相似，可以考虑合并为一个站点。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex">
+                                <div class="bg-primary/10 rounded-full p-3 mr-4 flex-shrink-0">
+                                    <i class="fa fa-map-marker text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-neutral-700 mb-2">优化站点位置</h4>
+                                    <p class="text-neutral-600">在一些学校、居民区和交通枢纽附近，乘客出行需求较大，但现有站点位置可能不太合理，导致乘客步行距离较远。建议对这些站点的位置进行优化，使其更靠近乘客出行集中区域，方便乘客上下车。例如，兰花路站可以适当向周边的学校（天台岚雅居乐小学、重庆市第110中学雅居乐校区）迁移，减少乘客步行时间。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex">
+                                <div class="bg-primary/10 rounded-full p-3 mr-4 flex-shrink-0">
+                                    <i class="fa fa-users text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-neutral-700 mb-2">增设临时站点</h4>
+                                    <p class="text-neutral-600">根据客流分布情况，在大型居民区、商业区等客流密集区域增设临时站点，提高公交覆盖率，方便更多乘客乘坐公交。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <h4 class="font-medium text-neutral-700 mb-3">站点优化示意图</h4>
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <img src="https://uy.wzznft.com/i/2025/05/14/j0ypmi.jpg" alt="方案一站点优化示意图" class="w-full h-auto rounded-lg">
+                                <p class="text-sm text-neutral-500 mt-2 text-center">方案一站点优化前后对比示意图</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 方案二：车辆调度优化 -->
+                    <div class="bg-neutral-50 rounded-xl shadow-card p-6 hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-1 animate-fade-in" style="animation-delay: 0.2s">
+                        <div class="bg-secondary text-white rounded-t-xl p-4 mb-6">
+                            <h3 class="text-xl font-bold flex items-center">
+                                <i class="fa fa-clock-o mr-2"></i>方案二：车辆调度优化
+                            </h3>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="flex">
+                                <div class="bg-secondary/10 rounded-full p-3 mr-4 flex-shrink-0">
+                                    <i class="fa fa-bus text-secondary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-neutral-700 mb-2">灵活调度车辆</h4>
+                                    <p class="text-neutral-600">根据客流实时变化情况，灵活调度车辆。例如，在终点站兰花路轻轨站，当发现有较多乘客携带行李准备换乘地铁且候车人数较多时，及时调配备有行李存放设施的车辆或增加临时班次，快速疏散乘客。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex">
+                                <div class="bg-secondary/10 rounded-full p-3 mr-4 flex-shrink-0">
+                                    <i class="fa fa-subway text-secondary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-neutral-700 mb-2">加强与地铁协调</h4>
+                                    <p class="text-neutral-600">我们发现部分乘客在公交上行路段中携带大量行李，可能是前往兰花路轻轨站进行地铁10号线的搭乘。加强与地铁十号线的运营协调，建立信息共享机制，实时掌握地铁的运行情况和客流量，以便更好地调整3108路公交车的发车时间和运营策略，实现公交与地铁的无缝衔接，提高公共交通整体的运输效率。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex">
+                                <div class="bg-secondary/10 rounded-full p-3 mr-4 flex-shrink-0">
+                                    <i class="fa fa-line-chart text-secondary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-neutral-700 mb-2">动态调整发车间隔</h4>
+                                    <p class="text-neutral-600">根据不同时段的客流量变化，动态调整发车间隔。在高峰时段适当增加车辆投放，缩短发车间隔；在平峰时段减少车辆投放，延长发车间隔，提高车辆利用率。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <h4 class="font-medium text-neutral-700 mb-3">智能调度系统示意图</h4>
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <img src="https://uy.wzznft.com/i/2025/05/14/j36z56.jpg" alt="方案二智能调度系统示意图" class="w-full h-auto rounded-lg">
+                                <p class="text-sm text-neutral-500 mt-2 text-center">方案二智能调度系统工作流程示意图</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 对比分析 -->
+        <section id="comparison" class="py-16 bg-neutral-50">
+            <div class="container mx-auto px-4 md:px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.75rem,3vw,2.5rem)] font-bold text-neutral-700 mb-4">对比分析</h2>
+                    <p class="text-neutral-500 max-w-3xl mx-auto">基于多维度评价指标，对比两种优化方案的优劣</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-card p-6 hover:shadow-card-hover transition-shadow duration-300 mb-12 animate-fade-in">
+                    <h3 class="text-xl font-bold text-neutral-700 mb-6 flex items-center">
+                        <i class="fa fa-bar-chart text-primary mr-2"></i>方案综合评价对比
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="h-80">
+                            <canvas id="comparisonChart"></canvas>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="bg-neutral-50 p-4 rounded-lg">
+                                <h4 class="font-medium text-neutral-700 mb-3">评价指标权重</h4>
+                                <ul class="space-y-2 text-neutral-600">
+                                    <li>• <span class="font-medium">服务性指标</span>（30%）：包括乘客平均步行距离、候车时间、换乘便捷度</li>
+                                    <li>• <span class="font-medium">经济性指标</span>（30%）：涵盖运营成本、收入</li>
+                                    <li>• <span class="font-medium">可持续性指标</span>（40%）：包含能源消耗、环境影响</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-neutral-50 p-4 rounded-lg">
+                                <h4 class="font-medium text-neutral-700 mb-3">方案综合得分</h4>
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span>方案一：站点优化与发车间隔调整</span>
+                                            <span class="font-medium">82分</span>
+                                        </div>
+                                        <div class="w-full bg-neutral-200 rounded-full h-2">
+                                            <div class="bg-primary h-2 rounded-full" style="width: 82%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span>方案二：智能调度与动态优化</span>
+                                            <span class="font-medium">88分</span>
+                                        </div>
+                                        <div class="w-full bg-neutral-200 rounded-full h-2">
+                                            <div class="bg-secondary h-2 rounded-full" style="width: 88%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-xl shadow-card p-6 hover:shadow-card-hover transition-shadow duration-300 animate-fade-in">
+                        <h3 class="text-xl font-bold text-neutral-700 mb-4 flex items-center">
+                            <i class="fa fa-check-circle text-green-500 mr-2"></i>方案一优势
+                        </h3>
+                        <ul class="space-y-3 text-neutral-600">
+                            <li>• 站点合并与位置优化能有效减少乘客步行距离，提升便利性</li>
+                            <li>• 发车间隔调整简单易行，无需大量技术投入</li>
+                            <li>• 与地铁协调措施可提高换乘效率，吸引更多乘客</li>
+                            <li>• 初期实施成本较低，见效快</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-card p-6 hover:shadow-card-hover transition-shadow duration-300 animate-fade-in" style="animation-delay: 0.2s">
+                        <h3 class="text-xl font-bold text-neutral-700 mb-4 flex items-center">
+                            <i class="fa fa-check-circle text-green-500 mr-2"></i>方案二优势
+                        </h3>
+                        <ul class="space-y-3 text-neutral-600">
+                            <li>• 动态发车间隔更灵活，能更好地适应不同时段的客流变化</li>
+                            <li>• 智能调度系统提升运营效率，减少人工干预</li>
+                            <li>• 新能源车辆使用符合环保要求，降低长期运营成本</li>
+                            <li>• 线上服务查询功能提升乘客体验，符合数字化发展趋势</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 局限性分析 -->
+        <section id="limitations" class="py-16 bg-white">
+            <div class="container mx-auto px-4 md:px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-[clamp(1.75rem,3vw,2.5rem)] font-bold text-neutral-700 mb-4">局限性分析</h2>
+                    <p class="text-neutral-500 max-w-3xl mx-auto">两种优化方案在实施过程中可能面临的挑战与限制</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 技术局限 -->
+                    <div class="bg-neutral-50 rounded-xl shadow-card p-6 hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-1 animate-fade-in">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                            <i class="fa fa-microchip text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-neutral-700 mb-4 text-center">技术局限</h3>
+                        <ul class="space-y-3 text-neutral-600">
+                            <li>• 智能调度系统和实时公交数据获取的稳定性有待提高，可能出现数据延迟或错误，影响调度准确性</li>
+                            <li>• 部分老旧车辆可能无法兼容新的智能监控设备，需要进行车辆改造或更换</li>
+                            <li>• 线上服务查询功能的开发和维护需要专业技术团队支持，技术门槛较高</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- 经济局限 -->
+                    <div class="bg-neutral-50 rounded-xl shadow-card p-6 hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-1 animate-fade-in" style="animation-delay: 0.2s">
+                        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                            <i class="fa fa-money text-secondary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-neutral-700 mb-4 text-center">经济局限</h3>
+                        <ul class="space-y-3 text-neutral-600">
+                            <li>• 站点优化、车辆购置和维护成本高，如新建临时停靠点需土地和建设费用，新能源车辆采购成本高于传统燃油车</li>
+                            <li>• 智能调度系统的开发和部署需要大量资金投入，包括硬件设备和软件开发费用</li>
+                            <li>• 初期实施阶段可能因调整不适应导致运营效率短暂下降，带来一定经济损失</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- 实施条件局限 -->
+                    <div class="bg-neutral-50 rounded-xl shadow-card p-6 hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-1 animate-fade-in" style="animation-delay: 0.4s">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                            <i class="fa fa-building text-green-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-neutral-700 mb-4 text-center">实施条件局限</h3>
+                        <ul class="space-y-3 text-neutral-600">
+                            <li>• 站点位置调整涉及土地规划、居民意见等问题，协调难度大</li>
+                            <li>• 与地铁运营协调需建立跨部门合作机制，沟通成本高</li>
+                            <li>• 乘客对新的发车间隔和服务方式需要时间适应，初期可能引发不满</li>
+                            <li>• 政策支持和相关法规的配套可能滞后，影响方案推进速度</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-neutral-700 text-white py-12">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">重庆主城区3108路公交运营组织优化分析</h3>
+                    <p class="text-neutral-300">本网站基于实际调查数据，对3108路公交运营情况进行全面分析，并提出科学优化方案，旨在提升公交服务质量与效率。</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4">相关链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors duration-200">重庆公交官网</a></li>
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors duration-200">重庆交通委员会</a></li>
+                        <li><a href="#" class="text-neutral-300 hover:text-white transition-colors duration-200">公共交通研究中心</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4">联系我们</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fa fa-envelope-o mr-2"></i>
+                            <span>contact@example.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-phone mr-2"></i>
+                            <span>023-12345678</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-map-marker mr-2"></i>
+                            <span>重庆市南岸区学府大道</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-neutral-600 pt-8 text-center text-neutral-400">
+                <p>&copy; 2025 重庆主城区3108路公交运营组织优化分析项目组. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const nav = document.getElementById('main-nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('nav-scrolled');
+            } else {
+                nav.classList.remove('nav-scrolled');
+            }
+        });
+        
+        // 移动端菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // 关闭移动端菜单
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                }
+            });
+        });
+        
+        // 图表初始化
+        window.addEventListener('load', function() {
+            // 客流特征图表
+            const passengerFlowCtx = document.getElementById('passengerFlowChart').getContext('2d');
+            new Chart(passengerFlowCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['轨道兰花路', '美堤雅城', '二塘路口', '二塘路中段', '二塘路下口', '丹龙南路'],
+                    datasets: [
+                        {
+                            label: '上行上车人数',
+                            data: [8, 3, 5, 0, 0, 0],
+                            backgroundColor: 'rgba(22, 93, 255, 0.7)',
+                            borderColor: 'rgba(22, 93, 255, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '上行下车人数',
+                            data: [0, 2, 3, 6, 0, 0],
+                            backgroundColor: 'rgba(22, 93, 255, 0.4)',
+                            borderColor: 'rgba(22, 93, 255, 0.6)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '下行上车人数',
+                            data: [0, 3, 2, 4, 1, 2],
+                            backgroundColor: 'rgba(255, 125, 0, 0.7)',
+                            borderColor: 'rgba(255, 125, 0, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '下行下车人数',
+                            data: [6, 2, 4, 0, 1, 0],
+                            backgroundColor: 'rgba(255, 125, 0, 0.4)',
+                            borderColor: 'rgba(255, 125, 0, 0.6)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '客流量'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '站点名称'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + ' 人';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 站点间距图表
+            const stationDistanceCtx = document.getElementById('stationDistanceChart').getContext('2d');
+            new Chart(stationDistanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['轨道兰花路-美堤雅城', '美堤雅城-二塘路口', '二塘路口-二塘路中段', '二塘路中段-二塘路口', '二塘路口-二塘路下口', '二塘路下口-丹龙南路', '丹龙南路-美堤雅城'],
+                    datasets: [{
+                        label: '站点间距(米)',
+                        data: [500, 700, 800, 800, 350, 400, 500],
+                        backgroundColor: 'rgba(22, 93, 255, 0.2)',
+                        borderColor: 'rgba(22, 93, 255, 1)',
+                        borderWidth: 2,
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '距离(米)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + ' 米';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 方案对比图表
+            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+            new Chart(comparisonCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['服务性', '经济性', '可持续性', '实施难度', '乘客满意度'],
+                    datasets: [
+                        {
+                            label: '方案一',
+                            data: [85, 78, 82, 75, 80],
+                            backgroundColor: 'rgba(22, 93, 255, 0.2)',
+                            borderColor: 'rgba(22, 93, 255, 1)',
+                            pointBackgroundColor: 'rgba(22, 93, 255, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(22, 93, 255, 1)'
+                        },
+                        {
+                            label: '方案二',
+                            data: [90, 80, 88, 65, 85],
+                            backgroundColor: 'rgba(255, 125, 0, 0.2)',
+                            borderColor: 'rgba(255, 125, 0, 1)',
+                            pointBackgroundColor: 'rgba(255, 125, 0, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(255, 125, 0, 1)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>    
